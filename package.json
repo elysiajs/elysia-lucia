@@ -1,6 +1,6 @@
 {
   "name": "@elysiajs/lucia-auth",
-  "version": "0.7.0-exp.0",
+  "version": "0.7.0-exp.1",
   "description": "Plugin for Elysia authenticaion using Lucia",
   "author": {
     "name": "saltyAom",

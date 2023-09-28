@@ -96,9 +96,8 @@ export const Lucia = <
                     }: {
                         username: string
                         password: string
-                    } & {
-                        [attributes in string]: unknown
-                    },
+                    } & // @ts-ignore
+                    Lucia.DatabaseUserAttributes,
                     {
                         createSession = false
                     }: {
