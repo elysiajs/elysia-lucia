@@ -1,0 +1,75 @@
+{
+  "name": "@elysiajs/lucia-auth",
+  "version": "0.7.0-exp.0",
+  "description": "Plugin for Elysia authenticaion using Lucia",
+  "author": {
+    "name": "saltyAom",
+    "url": "https://github.com/SaltyAom",
+    "email": "saltyaom@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elysiajs/elysia-lucia"
+  },
+  "main": "./dist/index.js",
+  "devDependencies": {
+    "@elysiajs/swagger": "^0.7.3",
+    "@lucia-auth/adapter-mysql": "^2.1.0",
+    "@lucia-auth/adapter-postgresql": "^2.0.1",
+    "@lucia-auth/adapter-prisma": "^3.0.1",
+    "@lucia-auth/adapter-session-redis": "^2.1.1",
+    "@lucia-auth/adapter-sqlite": "^1.1.1",
+    "@planetscale/database": "^1.11.0",
+    "@prisma/client": "^5.3.0",
+    "@types/node": "^20.1.4",
+    "@types/ora": "^3.2.0",
+    "@types/pg": "^8.10.2",
+    "@types/sqlite3": "^3.1.8",
+    "better-sqlite3": "^8.4.0",
+    "bun-types": "^0.6.9",
+    "drizzle-orm": "^0.27.0",
+    "elysia": "0.7.14",
+    "eslint": "^8.40.0",
+    "mysql2": "^3.4.0",
+    "pg": "^8.11.0",
+    "prisma": "^5.3.0",
+    "redis": "^4.6.7",
+    "rimraf": "4.4.1",
+    "typescript": "^5.2.2"
+  },
+  "peerDependencies": {
+    "elysia": ">= 0.7.0"
+  },
+  "exports": {
+    "bun": "./dist/index.js",
+    "node": "./dist/cjs/index.js",
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
+  "bugs": "https://github.com/elysiajs/elysia-lucia/issues",
+  "homepage": "https://github.com/elysiajs/elysia-lucia",
+  "keywords": [
+    "elysia",
+    "lucia",
+    "auth"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "dev": "bun run --hot example/index.ts",
+    "test": "bun test",
+    "test:node": "npm install --prefix ./test/node/cjs/ && npm install --prefix ./test/node/esm/ && node ./test/node/cjs/index.js && node ./test/node/esm/index.js",
+    "build": "rimraf dist && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
+    "release": "npm run build && npm run test && npm publish --access public"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@lucia-auth/oauth": "^3.3.0",
+    "lucia": "^2.7.0"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "src"
+  ]
+}
