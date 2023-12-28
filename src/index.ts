@@ -1,4 +1,4 @@
-import { Elysia, t, type LocalHook } from 'elysia'
+import { Elysia, t, type LocalHook, type CookieOptions } from 'elysia'
 
 import { lucia, type Auth, type Configuration } from 'lucia'
 
@@ -36,9 +36,19 @@ import {
     type Prettify
 } from './utils'
 
-import type { CookieOptions } from 'elysia/dist/cookie'
-
 export const Lucia = <
+    const Attributes extends Record<
+        string,
+        unknown
+        // @ts-ignore
+    > = never extends Lucia.DatabaseUserAttributes
+        ? Record<
+              string,
+              unknown
+              // @ts-ignore
+          >
+        : // @ts-ignore
+          Lucia.DatabaseUserAttributes,
     const Name extends string = 'user',
     const SessionName extends string = 'session'
 >(
@@ -49,6 +59,7 @@ export const Lucia = <
         } & Omit<Configuration, 'env'> & {
                 env?: Configuration['env']
                 cookie?: Parameters<typeof t.Cookie>[1]
+                key?: string
             }
     >
 ) => {
@@ -63,6 +74,17 @@ export const Lucia = <
     const name: Name = configuration.name ?? ('user' as Name)
     const sessionName: SessionName =
         configuration.session ?? ('session' as SessionName)
+
+    const key = configuration.key ?? 'username'
+
+    const {
+        maxAge = 60 * 60 * 24 * 30,
+        expires = 60 * 60 * 24 * 30,
+        sameSite = 'none',
+        httpOnly = true,
+        path = '/',
+        ...cookieOptions
+    } = configuration.cookie ?? {}
 
     const elysia = new Elysia({
         name: '@elysiajs/lucia-auth',
@@ -85,8 +107,10 @@ export const Lucia = <
                         throw new InvalidSession()
                     }
                 },
-                get data() {
-                    return decorators.id.then(async (id) => auth.getUser(id))
+                get profile() {
+                    return decorators.id.then(async (id) =>
+                        auth.getUser(id)
+                    ) as Promise<Attributes>
                 },
                 async signUp(
                     {
@@ -96,8 +120,7 @@ export const Lucia = <
                     }: {
                         username: string
                         password: string
-                    } & // @ts-ignore
-                    Lucia.DatabaseUserAttributes,
+                    } & Partial<Attributes>,
                     {
                         createSession = false
                     }: {
@@ -111,7 +134,7 @@ export const Lucia = <
                 ) {
                     const data = await auth.createUser({
                         key: {
-                            providerId: 'username',
+                            providerId: key,
                             providerUserId: username,
                             password
                         },
@@ -122,15 +145,18 @@ export const Lucia = <
                     })
 
                     if (createSession)
-                        await decorators.signIn(username, password)
+                        await decorators.signIn({
+                            username,
+                            password
+                        })
 
                     return data
                 },
-                async signIn(username: string, password: string) {
+                async signIn(user: { username: string; password: string }) {
                     const { userId } = await auth.useKey(
-                        'username',
-                        username,
-                        password
+                        key,
+                        user.username,
+                        user.password
                     )
 
                     const { sessionId } = await auth.createSession({
@@ -140,9 +166,15 @@ export const Lucia = <
 
                     session.value = sessionId
                     session.set({
-                        httpOnly: true,
-                        maxAge: 3600,
-                        path: '/'
+                        maxAge,
+                        expires:
+                            expires instanceof Date
+                                ? expires
+                                : new Date(Date.now() + expires * 1000),
+                        sameSite,
+                        httpOnly,
+                        path,
+                        ...cookieOptions
                     })
                 },
                 async updateUser(
@@ -153,7 +185,7 @@ export const Lucia = <
                 },
                 async updatePassword(username: string, password: string) {
                     const { userId } = await auth.updateKeyPassword(
-                        'username',
+                        key,
                         username,
                         password
                     )
@@ -221,6 +253,23 @@ export const Lucia = <
             return {
                 [name as Name]: decorators
             } as Record<Name, typeof decorators>
+        })
+        .macro(({ onBeforeHandle }) => {
+            return {
+                isSignIn(value: boolean) {
+                    onBeforeHandle(async ({ cookie }) => {
+                        const session = cookie[sessionName]
+
+                        if (!session.value) throw new InvalidSession()
+
+                        try {
+                            await auth.validateSession(session.value)
+                        } catch {
+                            throw new InvalidSession()
+                        }
+                    })
+                }
+            }
         })
 
     return {

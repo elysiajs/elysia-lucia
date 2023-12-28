@@ -1,6 +1,6 @@
 {
   "name": "@elysiajs/lucia-auth",
-  "version": "0.7.0-exp.1",
+  "version": "0.8.0-exp.1",
   "description": "Plugin for Elysia authenticaion using Lucia",
   "author": {
     "name": "saltyAom",
@@ -28,7 +28,7 @@
     "better-sqlite3": "^8.4.0",
     "bun-types": "^0.6.9",
     "drizzle-orm": "^0.27.0",
-    "elysia": "0.7.14",
+    "elysia": "0.8.0-rc.4",
     "eslint": "^8.40.0",
     "mysql2": "^3.4.0",
     "pg": "^8.11.0",

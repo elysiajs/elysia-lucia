@@ -11,12 +11,23 @@ const { GH_CLIENT_ID, GH_CLIENT_SECRET } = process.env
 if (!GH_CLIENT_ID || !GH_CLIENT_SECRET)
     throw new Error('GitHub OAuth token is need')
 
-const { elysia, lucia, oauth } = Lucia({
+const {
+    elysia: auth,
+    lucia,
+    oauth
+} = Lucia<
+    {
+        username: string
+        age: number
+    },
+    'user'
+>({
+    name: 'user',
     adapter: adapter(new PrismaClient())
 })
-    
-const auth = new Elysia({ prefix: '/auth' })
-    .use(elysia)
+
+const authController = new Elysia({ prefix: '/auth' })
+    .use(auth)
     .use(
         oauth.github({
             clientId: GH_CLIENT_ID,
@@ -33,26 +44,23 @@ const auth = new Elysia({ prefix: '/auth' })
         (app) =>
             app
                 .put('/sign-up', async ({ body, user }) => user.signUp(body))
-                .post(
-                    '/sign-in',
-                    async ({ user, body: { username, password } }) => {
-                        await user.signIn(username, password)
+                .post('/sign-in', async ({ user, body }) => {
+                    await user.signIn(body)
 
-                        return `Sign in as ${username}`
-                    }
-                )
+                    return `Sign in as ${body.username}`
+                })
     )
     .guard(
         {
-            beforeHandle: ({ user: { validate } }) => validate()
+            isSignIn: true
         },
         (app) =>
             app
-                .get('/profile', ({ user }) => user.data)
+                .get('/profile', ({ user }) => user.profile)
                 .get('/refresh', async ({ user }) => {
                     await user.refresh()
 
-                    return user.data
+                    return user.profile
                 })
                 .get('/sign-out', async ({ user }) => {
                     await user.signOut()
@@ -62,14 +70,14 @@ const auth = new Elysia({ prefix: '/auth' })
     )
 
 const app = new Elysia()
-    .use(elysia)
-    .onBeforeHandle(async ({ path, user }) => {
-        switch (path) {
-            case '/swagger':
-            case '/swagger/json':
-                await user.validate()
-        }
-    })
+    .use(authController)
+    // .onBeforeHandle(async ({ path, user }) => {
+    //     switch (path) {
+    //         case '/swagger':
+    //         case '/swagger/json':
+    //             await user.validate()
+    //     }
+    // })
     .use(swagger())
     .use(auth)
     .listen(3000, ({ hostname, port }) => {
