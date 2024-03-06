@@ -93,7 +93,7 @@ export const Lucia = <
         .error({
             INVALID_SESSION: InvalidSession
         })
-        .derive(async ({ cookie }) => {
+        .derive({ as: 'global' }, async ({ cookie }) => {
             const session = cookie[sessionName]
 
             const decorators = {
