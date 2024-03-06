@@ -55,8 +55,8 @@ export const createOAuth =
                     }
                 >
                 hook?: {
-                    redirect?: LocalHook
-                    callback?: LocalHook
+                    redirect?: LocalHook<any, any, any, any, any, any, any>
+                    callback?: LocalHook<any, any, any, any, any, any, any>
                 }
                 cookie?: {
                     state?: CookieOptions
@@ -199,8 +199,8 @@ export const createOAuthWithPKCE =
             }
         >
         hook?: {
-            redirect?: LocalHook
-            callback?: LocalHook
+            redirect?: LocalHook<any, any, any, any, any, any, any>
+            callback?: LocalHook<any, any, any, any, any, any, any>
         }
         cookie?: {
             state?: CookieOptions
