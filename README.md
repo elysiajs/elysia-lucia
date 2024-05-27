@@ -30,14 +30,11 @@ const auth = new Elysia({ prefix: '/auth' })
         (app) =>
             app
                 .put('/sign-up', async ({ body, user }) => user.signUp(body))
-                .post(
-                    '/sign-in',
-                    async ({ user, body: { username, password } }) => {
-                        await user.signIn(username, password)
+                .post('/sign-in', async ({ user, body }) => {
+                    await user.signIn(body)
 
-                        return `Sign in as ${username}`
-                    }
-                )
+                    return `Sign in as ${body.username}`
+                })
     )
     .guard(
         {
