@@ -93,7 +93,7 @@ export const Lucia = <
         .error({
             INVALID_SESSION: InvalidSession
         })
-        .derive({ as: 'global' }, async ({ cookie }) => {
+        .derive({ as: 'global' }, function deriveAuth({ cookie }) {
             const session = cookie[sessionName]
 
             const decorators = {
@@ -101,7 +101,7 @@ export const Lucia = <
                 get id() {
                     try {
                         return auth
-                            .getSession(session.value)
+                            .getSession(session.value as string)
                             .then(({ user: { userId } }) => userId)
                     } catch {
                         throw new InvalidSession()
@@ -200,28 +200,28 @@ export const Lucia = <
                 async refresh() {
                     const { userId: id, sessionId } = await auth.createSession({
                         userId: await decorators.id,
-                        sessionId: session.value,
+                        sessionId: session.value as string,
                         attributes: {}
                     })
 
                     session.value = sessionId
                 },
                 async signOut(type?: 'all' | 'unused' | 'current') {
-                    if (!type) await auth.invalidateSession(session.value)
+                    if (!type) await auth.invalidateSession(session.value as string)
                     else
                         switch (type) {
                             case 'all':
                                 await auth.invalidateAllUserSessions(
-                                    session.value
+                                    session.value as string
                                 )
                                 break
 
                             case 'current':
-                                await auth.invalidateSession(session.value)
+                                await auth.invalidateSession(session.value as string)
                                 break
 
                             case 'unused':
-                                await auth.deleteDeadUserSessions(session.value)
+                                await auth.deleteDeadUserSessions(session.value as string)
                                 break
                         }
 
@@ -234,7 +234,7 @@ export const Lucia = <
                 }) {
                     await Promise.all([
                         auth.deleteUser(await decorators.id),
-                        auth.invalidateAllUserSessions(session.value)
+                        auth.invalidateAllUserSessions(session.value as string)
                     ])
 
                     session.remove()
@@ -243,7 +243,7 @@ export const Lucia = <
                     if (!session.value) throw new InvalidSession()
 
                     try {
-                        await auth.validateSession(session.value)
+                        await auth.validateSession(session.value as string)
                     } catch {
                         throw new InvalidSession()
                     }
@@ -252,18 +252,18 @@ export const Lucia = <
 
             return {
                 [name as Name]: decorators
-            } as Record<Name, typeof decorators>
+            }
         })
         .macro(({ onBeforeHandle }) => {
             return {
                 isSignIn(value: boolean) {
-                    onBeforeHandle(async ({ cookie }) => {
+                    onBeforeHandle(async function checkSession({ cookie }) {
                         const session = cookie[sessionName]
 
                         if (!session.value) throw new InvalidSession()
 
                         try {
-                            await auth.validateSession(session.value)
+                            await auth.validateSession(session.value as string)
                         } catch {
                             throw new InvalidSession()
                         }

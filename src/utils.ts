@@ -2,7 +2,7 @@ import { Elysia, type LocalHook } from 'elysia'
 
 import { type lucia } from 'lucia'
 
-import type { CookieOptions } from 'elysia/dist/cookie'
+import type { CookieOptions } from 'elysia'
 import type {
     OAuth2ProviderAuth,
     OAuth2ProviderAuthWithPKCE
@@ -224,7 +224,7 @@ export const createOAuthWithPKCE =
         })
             .get(
                 path,
-                async ({ cookie: { oauthState, oauthVerifier }, set }) => {
+                async ({ cookie: { oauthState, oauthVerifier }, redirect, set }) => {
                     const [url, verifier, state] =
                         await provider.getAuthorizationUrl()
 
@@ -244,7 +244,7 @@ export const createOAuthWithPKCE =
                         maxAge: 3600
                     })
 
-                    set.redirect = url.toString()
+                    return redirect(url.toString())
                 },
                 hook.redirect
             )
@@ -265,7 +265,7 @@ export const createOAuthWithPKCE =
 
                     const callback = await provider.validateCallback(
                         code as string,
-                        oauthVerifier.value
+                        oauthVerifier.value as string
                     )
 
                     const { getExistingUser, createUser, createKey } = callback

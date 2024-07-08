@@ -1,6 +1,6 @@
 {
   "name": "@elysiajs/lucia-auth",
-  "version": "1.0.0-exp.0",
+  "version": "1.1.0-exp.1",
   "description": "Plugin for Elysia authenticaion using Lucia",
   "author": {
     "name": "saltyAom",
@@ -13,7 +13,7 @@
   },
   "main": "./dist/index.js",
   "devDependencies": {
-    "@elysiajs/swagger": "^1.0.0-rc.0",
+    "@elysiajs/swagger": "^1.1.0-exp.1",
     "@lucia-auth/adapter-mysql": "^2.1.0",
     "@lucia-auth/adapter-postgresql": "^2.0.1",
     "@lucia-auth/adapter-prisma": "^3.0.1",
@@ -28,7 +28,7 @@
     "better-sqlite3": "^8.4.0",
     "bun-types": "^0.6.9",
     "drizzle-orm": "^0.27.0",
-    "elysia": "1.0.0-rc.2",
+    "elysia": "1.1.0-exp.17",
     "eslint": "^8.40.0",
     "mysql2": "^3.4.0",
     "pg": "^8.11.0",
@@ -38,7 +38,7 @@
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "elysia": ">= 1.0.0-rc.0"
+    "elysia": ">= 1.1.0-exp.17"
   },
   "exports": {
     "bun": "./dist/index.js",
