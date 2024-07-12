@@ -21,6 +21,9 @@ CHANGELOG.md
 .eslintrc.js
 tsconfig.cjs.json
 tsconfig.esm.json
+tsconfig.dts.json
+src
+build.ts
 
 bin-src
 prisma
