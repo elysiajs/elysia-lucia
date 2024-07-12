@@ -7,7 +7,7 @@
 		"dev": "bun run --hot example/index.ts",
 		"test": "bun test",
 		"test:node": "npm install --prefix ./test/node/cjs/ && npm install --prefix ./test/node/esm/ && node ./test/node/cjs/index.js && node ./test/node/esm/index.js",
-		"build": "rimraf dist && tsc --project tsconfig.esm.json && tsc --project tsconfig.cjs.json",
+		"build": "bun build.ts",
 		"release": "npm run build && npm run test && npm publish --access public"
 	},
 	"main": "./dist/cjs/index.js",
@@ -26,7 +26,7 @@
 		"lucia": "^2.7.0"
 	},
 	"devDependencies": {
-		"@elysiajs/swagger": "^1.1.0-exp.1",
+		"@elysiajs/swagger": "^1.1.0-rc.0",
 		"@lucia-auth/adapter-mysql": "^2.1.0",
 		"@lucia-auth/adapter-postgresql": "^2.0.1",
 		"@lucia-auth/adapter-prisma": "^3.0.1",
@@ -47,7 +47,7 @@
 		"pg": "^8.11.0",
 		"prisma": "^5.3.0",
 		"redis": "^4.6.7",
-		"rimraf": "4.4.1",
+		"tsup": "^8.1.0",
 		"typescript": "^5.2.2"
 	},
 	"peerDependencies": {
