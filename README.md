@@ -1,3 +1,5 @@
+# Experimental package, DO NOT USE
+
 # @elysiajs/lucia-auth
 Plugin for [elysia](https://github.com/saltyaom/elysia) authentication using Lucia
 
