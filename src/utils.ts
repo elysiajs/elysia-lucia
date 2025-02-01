@@ -16,7 +16,7 @@ type MaybePromise<T> = T | Promise<T>
 
 export const createOAuth =
 	<
-		Name extends string,
+		const Name extends string,
 		const AuthConstructor extends (...a: any[]) => OAuth2ProviderAuth
 	>(
 		auth: ReturnType<typeof lucia>,

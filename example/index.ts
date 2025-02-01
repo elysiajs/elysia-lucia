@@ -22,7 +22,6 @@ const {
     },
     'user'
 >({
-    name: 'user',
     adapter: adapter(new PrismaClient())
 })
 
